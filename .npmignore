@@ -1,4 +1,5 @@
 .DS_Store
+.env
 .github/
 node_modules/
 Makefile
