@@ -1,6 +1,6 @@
 {
     "name": "ha-monitor-api",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Lightweight API that exposes the system's health metrics to Home Assistant",
     "author": "Igor Ramadas",
     "main": "index.js",

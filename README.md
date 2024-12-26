@@ -14,14 +14,14 @@ It's compatible with most Linux distros, Raspberry Pi and similar SBCs. In theor
 
 The service is fully configured via environment variables prefixed with `HAMONITOR_`.
 
-| Environment Variable | Default Value | Description                                                                                                                          |
-| -------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `HAMONITOR_PORT`     | 9999          | Port on which the API will listen                                                                                                    |
-| `HAMONITOR_TOKEN`    | null          | Optional bearer token for authorization                                                                                              |
-| `HAMONITOR_LOGLEVEL` | "info"        | Log level (none, error, info), set to "error" if you want the service to log errors only, or "none" to disable logs completely       |
-| `HAMONITOR_BRIEF`    | false         | Return only the main file system and main network stats as a single object, instead of listing all the available objects as an array |
-| `HAMONITOR_ROUND`    | false         | Round values to a maximum of 1 decimal places                                                                                        |
-| `HAMONITOR_UNITS`    | false         | Add units to the values and and humanize file sizes (b, kb, mb, gb and tb)                                                           |
+| Environment Variable | Default Value | Description                                                                                                                           |
+| -------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `HAMONITOR_PORT`     | 9999          | Port on which the API will listen                                                                                                     |
+| `HAMONITOR_TOKEN`    | null          | Optional bearer token for authorization                                                                                               |
+| `HAMONITOR_LOGLEVEL` | "info"        | Log level (none, error, info), set to "error" if you want the service to log errors only, or "none" to disable logs completely        |
+| `HAMONITOR_BRIEF`    | false         | Return only the main file system and main network stats as a single object, instead of listing all the available objects as an array  |
+| `HAMONITOR_ROUND`    | false         | Round values to a maximum of 1 decimal places                                                                                         |
+| `HAMONITOR_UNITS`    | false         | Add units to the values and and humanize file sizes (b, kb, mb, gb and tb), this will also change the affected field's type to string |
 
 If you prefer to have these settings on a file, you can create a `.env` file on the application root with the environment variables set, for example:
 
@@ -88,22 +88,21 @@ $ docker-compose up -d
 Getting the data into Home Assistant can be done via [RESTful sensors](https://www.home-assistant.io/integrations/sensor.rest).
 
 ```yaml
-sensor:
-    - platform: rest
-      name: Pi Server CPU
-      timeout: 10
-      resource: http://192.168.0.123:9999
-      headers:
-          Authorization: !secret my_sensor_secret_token
-          Content-Type: application/json
-          User-Agent: Home Assistant
-      sensor:
-          - name: Pi CPU Temperature
-            value_template: "{{ value_json['cpu']['temperature'] }}"
-          - name: Pi CPU Load Current
-            value_template: "{{ value_json['cpu']['loadCurrent'] }}"
-          - name: Pi CPU Load Average
-            value_template: "{{ value_json['cpu']['loadAverage'] }}"
+rest:
+    resource: http://192.168.0.123:9999
+    scan_interval: 60
+    timeout: 10
+    headers:
+        Authorization: !secret my_sensor_secret_token
+        Content-Type: application/json
+        User-Agent: Home Assistant
+    sensor:
+        - name: Pi CPU Temperature
+          value_template: "{{ value_json['cpu']['temperature'] }}"
+        - name: Pi CPU Load Current
+          value_template: "{{ value_json['cpu']['loadCurrent'] }}"
+        - name: Pi CPU Load Average
+          value_template: "{{ value_json['cpu']['loadAverage'] }}"
 ```
 
 ## Sample JSON responses
