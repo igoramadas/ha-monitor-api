@@ -1,5 +1,7 @@
 // HA-MONITOR-API
 
+require("dotenv").config()
+
 const express = require("express")
 const fs = require("fs")
 const http = require("http")
@@ -13,13 +15,15 @@ process.on("unhandledRejection", (ex) => {
     console.error(ex)
 })
 
+const parseBool = (value) => (value ? ["true", "yes", "1"].includes(value.toLowerCase()) : false)
+
 // Program variables.
 const PORT = process.env.HAMONITOR_PORT || 9999
 const TOKEN = process.env.HAMONITOR_TOKEN || null
 const LOGLEVEL = process.env.HAMONITOR_LOGLEVEL || "info"
-const BRIEF = process.env.HAMONITOR_BRIEF || false
-const ROUND = process.env.HAMONITOR_ROUND || false
-const UNITS = process.env.HAMONITOR_UNITS || false
+const BRIEF = parseBool(process.env.HAMONITOR_BRIEF)
+const ROUND = parseBool(process.env.HAMONITOR_ROUND)
+const UNITS = parseBool(process.env.HAMONITOR_UNITS)
 
 // Helpers to round (or not) and add units based on the program settings.
 const round = (value) => (!ROUND ? value || 0 : value ? Math.round((value + Number.EPSILON) * 100) / 100 : 0)
