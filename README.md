@@ -74,7 +74,7 @@ $ npm start
 
 ![License](https://img.shields.io/github/license/igoramadas/ha-monitor-api.svg) ![Docker](https://img.shields.io/docker/pulls/igoramadas/ha-monitor-api.png)
 
-The following system architectures are currently supported: `arm`, `arm64`, `amd64`.
+The following system architectures are currently supported: `arm64`, `amd64`.
 
 The easiest way to run it with Docker is by using the sample `docker-compose.yaml`. Simply download it to your directory of choice, make the desired changes (ie. settings via environment variables) and then execute:
 
