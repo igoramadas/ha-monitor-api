@@ -1,0 +1,34 @@
+{
+    "name": "ha-monitor-api",
+    "version": "0.1.0",
+    "description": "Lightweight API that exposes the system's health metrics to Home Assistant",
+    "author": "Igor Ramadas",
+    "main": "index.js",
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/igoramadas/ha-monitor-api.git"
+    },
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "express": "^5.0.0",
+        "systeminformation": "^5.23.23"
+    },
+    "optionalDependencies": {
+        "osx-temperature-sensor": "^1.0.8"
+    },
+    "peerDependencies": {
+        "pm2": "^5.4.3"
+    },
+    "prettier": {
+        "trailingComma": "none",
+        "tabWidth": 4,
+        "semi": false,
+        "singleQuote": false,
+        "arrowParens": "always",
+        "bracketSpacing": false,
+        "printWidth": 250
+    }
+}
