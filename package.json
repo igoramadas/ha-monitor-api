@@ -13,6 +13,7 @@
         "start": "node index.js"
     },
     "dependencies": {
+        "dotenv": "^16.4.7",
         "express": "^5.0.0",
         "systeminformation": "^5.23.23"
     },
