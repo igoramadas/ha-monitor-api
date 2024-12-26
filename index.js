@@ -26,9 +26,9 @@ const ROUND = parseBool(process.env.HAMONITOR_ROUND)
 const UNITS = parseBool(process.env.HAMONITOR_UNITS)
 
 // Helpers to round (or not) and add units based on the program settings.
-const round = (value) => (!ROUND ? value || 0 : value ? Math.round((value + Number.EPSILON) * 100) / 100 : 0)
-const roundSuffix = (value, suffix) => {
-    if (ROUND) value = round(value)
+const round = (value, decimals) => (!ROUND ? value || 0 : value ? (decimals ? Math.round((value + Number.EPSILON) * 100) / 100 : Math.round(value)) : 0)
+const roundSuffix = (value, suffix, decimals) => {
+    if (ROUND) value = round(value, decimals)
     return UNITS ? `${value}${suffix}` : value
 }
 const roundSize = (value, perSecond) => {
@@ -39,6 +39,9 @@ const roundSize = (value, perSecond) => {
             value /= 1024
             unit = sizeUnits.shift()
         }
+    }
+    if (perSecond) {
+        unit += "/s"
     }
     return roundSuffix(value, unit)
 }
@@ -84,7 +87,7 @@ app.get("/", async (req, res) => {
 
         const currentLoad = await si.currentLoad()
         result.cpu.loadCurrent = roundSuffix(currentLoad.currentLoad, "%")
-        result.cpu.loadAverage = round(currentLoad.avgLoad)
+        result.cpu.loadAverage = round(currentLoad.avgLoad, true)
     } catch (ex) {
         if (LOGLEVEL) {
             console.error(ex)
@@ -136,7 +139,7 @@ app.get("/", async (req, res) => {
 
         const disksIO = await si.disksIO()
         const fsStats = await si.fsStats()
-        result.fsStats = {rearPerSec: roundSize(fsStats.rx_sec, true), writePerSec: roundSize(fsStats.wx_sec, true), ioReadPerSec: roundSize(disksIO.rIO_sec, true), ioWritePerSec: roundSize(disksIO.wIO_sec, true)}
+        result.fsStats = {dataRead: roundSize(fsStats.rx_sec, true), dataWrite: roundSize(fsStats.wx_sec, true), ioRead: roundSize(disksIO.rIO_sec, true), ioWrite: roundSize(disksIO.wIO_sec, true)}
     } catch (ex) {
         if (LOGLEVEL) {
             console.error(ex)
@@ -150,7 +153,7 @@ app.get("/", async (req, res) => {
         const networkInterfaceDefault = await si.networkInterfaceDefault()
         const networkStats = await si.networkStats()
         const filter = (n) => {
-            return n ? {interface: n.iface, state: n.operstate, receivePerSec: roundSize(n.rx_sec, true), sendPerSec: roundSize(n.tx_sec, true)} : null
+            return n ? {interface: n.iface, state: n.operstate, rx: roundSize(n.rx_sec, true), tx: roundSize(n.tx_sec, true)} : null
         }
         if (BRIEF) {
             result.network = filter(networkStats.find(async (n) => n.iface == networkInterfaceDefault || n.operstate == "up") || networkStats[0])
@@ -199,5 +202,6 @@ si.wifiConnections()
 // Start the HTTP server.
 http.createServer(app).listen(PORT)
 if (LOGLEVEL == "info") {
-    console.log(`Starting ha-monitor-api on port ${PORT}`)
+    console.log(`Starting ha-monitor-api on port ${PORT}${TOKEN ? " (protected by token)" : ""}`)
+    console.log(`Brief: ${BRIEF}, Round: ${ROUND}, Units: ${UNITS}`)
 }
